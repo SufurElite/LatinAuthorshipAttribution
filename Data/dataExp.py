@@ -4,6 +4,10 @@
 import os, json, re, pickle
 from .preprocess import PreProcessor
 from .fetch import text_retrieval
+from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
+import matplotlib.cm as mplcm
+import matplotlib.colors as colors
 
 # Directories for the data after fetch.py is run
 LATIN_BASE_DIR = os.getcwd()+"/Data/texts/lat/text/"
@@ -18,8 +22,10 @@ class CorpusInterface:
         self.includeLineBreaks = False
         self.PrePro = PreProcessor()
         self.authorToWorks = {}
+        self.authorToColours = {}
         self.load_data()
-    
+        
+        
     def add_text(self, author: str, text: str) -> bool:
         """ Adds a particular text by a given author to the corpus, if the text does not already exist
         returns a boolean related to the success of adding the text"""
@@ -195,7 +201,19 @@ class CorpusInterface:
 
         # now print information about the corpus
         self.corpus_overview()
+        self.associate_author_to_colour()
+    
+    def associate_author_to_colour(self):
+        # create a colour map
         
+        authors = list(self.authorToWorks.keys())
+        authors.sort()
+        cm = plt.get_cmap('gist_rainbow')
+        cNorm  = colors.Normalize(vmin=0, vmax=len(authors)-1)
+        scalarMap = mplcm.ScalarMappable(norm=cNorm, cmap=cm)
+        for i in range(len(authors)):
+            self.authorToColours[authors[i]] = scalarMap.to_rgba(i)
+
     def corpus_overview(self, saveText: bool = False):
         """ Just a helper function to show some information about the corpus """
         authorStats = ""
@@ -214,6 +232,13 @@ class CorpusInterface:
                 f.write(authorStats)
             with open("authors.txt", "w+") as f:
                 f.write(authors)
+
+
+    def get_authors(self):
+        return self.authorToWorks.keys()
+
+    def get_author_color(self, author):
+        return self.authorToColours[author]
 
     def get_authors_by_text_size(self, characterCount: bool = True):
         def sort_tuple(tup):

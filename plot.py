@@ -1,7 +1,7 @@
 """
-    File to plot the findings from the Data Exploration file
+    Utility file to plot
 """
-from .dataExp import CorpusInterface as CI
+from Data.dataExp import CorpusInterface as CI
 from matplotlib import pyplot as plt 
 import numpy as np
 import os
@@ -19,7 +19,7 @@ def author_text_length_plot(ci: CI, n_authors: int = 50, save_file: bool = False
     
     for i in range(n_authors):
         x.append(values[i][0])
-        plt.bar(values[i][0],values[i][1], color = [np.random.rand(3) for i in range(n_authors)])
+        plt.bar(values[i][0],values[i][1], color = ci.get_author_color(values[i][0]))
     plt.xticks(rotation='vertical')
     plt.xlabel("Authors")
     plt.ylabel("Number of words in all of author's texts")
@@ -38,7 +38,7 @@ def author_work_count_plot(ci: CI, n_authors: int = 50, save_file: bool = False)
 
     for i in range(n_authors):
         x.append(values[i][0])
-        plt.bar(values[i][0],values[i][1], color = [np.random.rand(3) for i in range(n_authors)])
+        plt.bar(values[i][0],values[i][1], color = ci.get_author_color(values[i][0]))
     plt.xticks(rotation='vertical')
     plt.xlabel("Authors")
     plt.ylabel("Number of works per author")
@@ -56,7 +56,7 @@ def author_lexical_diversity_plot(ci: CI, authors, save_file: bool = False):
     x = []
     for i in range(len(authors)):
         x.append(values[i][0])
-        plt.bar(values[i][0],values[i][1], color = [np.random.rand(3) for i in range(len(authors))])
+        plt.bar(values[i][0],values[i][1], color = ci.get_author_color(authors[i]))
     plt.xticks(rotation='vertical')
     plt.xlabel("Authors")
     plt.ylabel("Lexical diversity across all of author's texts")
