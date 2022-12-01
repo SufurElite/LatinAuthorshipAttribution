@@ -15,20 +15,21 @@ class PreProcessor():
         self.st = SentenceTokenizer()
     
 
-    def preprocess(self, inputText: str, keepPunct: bool = True) -> list[str]:
+    def preprocess(self, inputText: str, keepPunct: bool = True, shouldTokenize: bool = True) -> list[str]:
         text = []
         # include only unicode characters
         inputText = unidecode(inputText).lower()
-        sents = self.st.tokenize(inputText)
+        if shouldTokenize:
+            sents = self.st.tokenize(inputText)
 
-        for sent in sents:
-            tmpSent = []
-            if not keepPunct:
-                sent = re.sub(r'[^\w\s]', '', sent)
-            wordToks = self.wt.tokenize(sent)
-            text+=wordToks
-            
-        return text 
+            for sent in sents:
+                tmpSent = []
+                if not keepPunct:
+                    sent = re.sub(r'[^\w\s]', '', sent)
+                wordToks = self.wt.tokenize(sent)
+                text+=wordToks
+            return text
+        return inputText 
 
 if __name__=="__main__":
     pp = PreProcessor()

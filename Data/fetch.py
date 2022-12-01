@@ -7,6 +7,7 @@ os.environ["CLTK_DATA"] = os.getcwd()+"Data/texts/"
 
 from cltk import NLP
 from cltk.data.fetch import FetchCorpus
+from cltk.embeddings.embeddings import Word2VecEmbeddings as W2VE
 
 
 def text_retrieval() -> None:
@@ -23,3 +24,6 @@ def text_retrieval() -> None:
     corpaDownloader.import_corpus("latin_text_corpus_grammaticorum_latinorum")
     print("Installing Language Models")
     corpaDownloader.import_corpus("lat_models_cltk")
+    print("Downloading Latin word2vec model")
+    w2v = W2VE(iso_code="lat")
+    

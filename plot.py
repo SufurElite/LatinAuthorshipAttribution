@@ -67,9 +67,10 @@ def author_lexical_diversity_plot(ci: CI, authors, save_file: bool = False):
         plt.show()
 
 
-def all_plots(ci = None):
+def all_plots(ci = None, save_files=False):
     if ci is None:
         ci = CI()
-    topAuthorsByTextLength, authors = author_text_length_plot(ci, n_authors=50)
-    topAuthorsByWorkCount = author_work_count_plot(ci, n_authors=50)
-    author_lexical_diversity_plot(ci, authors)
+    topAuthorsByTextLength, authors = author_text_length_plot(ci, n_authors=50, save_file = save_files)
+    topAuthorsByWorkCount = author_work_count_plot(ci, n_authors=50, save_file = save_files)
+    author_lexical_diversity_plot(ci, authors, save_file = save_files)
+    

@@ -15,10 +15,11 @@ LATIN_LIBRARY_DIR = LATIN_BASE_DIR+"lat_text_latin_library/"
 ITALIAN_POETS_DIR = LATIN_BASE_DIR+"latin_text_poeti_ditalia/cltk_json/"
 LATIN_TESSERAE_DIR = LATIN_BASE_DIR+"lat_text_tesserae/texts/"
 
-OUR_CORPUS_LOC = os.getcwd()+"/Data/corpus.pickle"
-
 class CorpusInterface:
-    def __init__(self):
+    def __init__(self, corpus_name="corpus.pickle", shouldTokenize:bool = True):
+        self.OUR_CORPUS_LOC=os.getcwd()+"/Data/"+corpus_name
+        # for the LatinBERT text encoding, tokenization will happen within the model
+        self.shouldTokenize = shouldTokenize
         self.includeLineBreaks = False
         self.PrePro = PreProcessor()
         self.authorToWorks = {}
@@ -26,13 +27,15 @@ class CorpusInterface:
         self.load_data()
         
         
+        
     def add_text(self, author: str, text: str) -> bool:
         """ Adds a particular text by a given author to the corpus, if the text does not already exist
         returns a boolean related to the success of adding the text"""
         if author not in self.authorToWorks:
             self.authorToWorks[author] = []
-        ppText = self.PrePro.preprocess(text, keepPunct = False)
-        self.authorToWorks[author].append([ppText,None])
+        
+        text = self.PrePro.preprocess(text, keepPunct = False, shouldTokenize = self.shouldTokenize)  
+        self.authorToWorks[author].append([text,None])
         return True
 
     def similarity_identification(self, textOne, textTwo, simPercent = .7):
@@ -178,11 +181,11 @@ class CorpusInterface:
         self.load_latin_library()
         
     def save_corpus(self):
-        with open(OUR_CORPUS_LOC, "wb") as f:
+        with open(self.OUR_CORPUS_LOC, "wb") as f:
             pickle.dump(self.authorToWorks, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     def load_existing_corpus(self):
-        with open(OUR_CORPUS_LOC, 'rb') as f:
+        with open(self.OUR_CORPUS_LOC, 'rb') as f:
             self.authorToWorks = pickle.load(f)
 
     def load_data(self):
@@ -191,7 +194,7 @@ class CorpusInterface:
             print("Did not find the downloaded corpus. Did you run fetch.py? Now calling text_retrieval from fetch.py")
             text_retrieval()
         # check if we have already created the dataset previously
-        if os.path.exists(OUR_CORPUS_LOC):
+        if os.path.exists(self.OUR_CORPUS_LOC):
             print("Found the existing corpus")
             self.load_existing_corpus()
         else: 
@@ -233,7 +236,6 @@ class CorpusInterface:
             with open("authors.txt", "w+") as f:
                 f.write(authors)
 
-
     def get_authors(self):
         return self.authorToWorks.keys()
 
@@ -257,6 +259,19 @@ class CorpusInterface:
         values = sort_tuple(values)
         return values
 
+    def get_data(self, n_authors: int = 50):
+        """ return the corpus's data that can be used by a model """
+        
+        texts = []
+        authors = []
+        
+        values = self.get_authors_by_text_size()
+
+        for i in range(n_authors):
+            authors.append(values[i][0])
+            texts.append(self.authorToWorks[values[i][0]])
+
+        return texts, authors
     def lexical_diversity(self, authors):
         """
             This will measure the lexical diversity of a subset of the authors provided.
