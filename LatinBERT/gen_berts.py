@@ -135,9 +135,52 @@ class LatinBERT():
 
 			return batched_data, batched_mask, batched_transforms, ordering
 
+	def get_bert_docs(self, raw_sents, labels, sent_tokenizer,word_tokenizer):
+		sents_label=convert_to_toks(raw_sents,labels,sent_tokenizer,word_tokenizer)
+		sents = [s[0] for s in sents_label]
+		author= [s[1] for s in sents_label]
 
-	def get_berts(self, raw_sents, labels):
-		sents_label=convert_to_toks(raw_sents, labels)
+		batch_size=32
+		batched_data, batched_mask, batched_transforms, ordering=self.get_batches(sents, batch_size, self.wp_tokenizer)
+		ordered_preds=[]
+		for b in range(len(batched_data)):
+			size=batched_transforms[b].shape
+			b_size=size[0]
+			berts=self.model.forward(batched_data[b], attention_mask=batched_mask[b], transforms=batched_transforms[b])
+			berts=berts.detach()
+			berts=berts.cpu()
+			for row in range(b_size):
+				ordered_preds.append([np.array(r) for r in berts[row]])
+
+		preds_in_order = [None for i in range(len(sents))]
+
+
+		for i, ind in enumerate(ordering):
+			preds_in_order[ind] = ordered_preds[i]
+
+
+		bert_docs=[]
+
+		for idx, sentence in enumerate(sents):
+			bert_doc=[]
+
+			bert_doc.append(preds_in_order[idx][0])
+
+			for t_idx in range(1, len(sentence)-1):
+				if t_idx==200-2: break
+				token=sentence[t_idx]
+				
+				pred=preds_in_order[idx][t_idx]
+				bert_doc.append(pred)
+
+			bert_doc.append(preds_in_order[idx][len(sentence)-1])
+			tmp = np.array(bert_doc)
+			bert_docs.append(np.mean(tmp, axis=0))
+
+		return bert_docs, author
+
+	def get_berts(self, raw_sents, labels, sent_tokenizer,word_tokenizer):
+		sents_label=convert_to_toks(raw_sents,labels,sent_tokenizer,word_tokenizer)
 		sents = [s[0] for s in sents_label]
 		author= [s[1] for s in sents_label]
 
@@ -234,18 +277,27 @@ class LatinTokenizer():
 
 		return wp_tokens
 
-def convert_to_toks(input_sents,sents_label):
-
-	sent_tokenizer = SentenceTokenizer()
-	word_tokenizer = WordTokenizer()
+def convert_to_toks(input_sents,sents_label,sent_tokenizer,word_tokenizer):
 
 	all_sents=[]
-
+	leave_loop = False
+	cur_count = 0
+	last_auth = sents_label[0]
 	for i in range(len(input_sents)):
+		"""if i!=0 and last_auth!=sents_label[i]:
+				cur_count= 0
+				last_auth = sents_label[i-1]
+		if cur_count == max_sent and last_auth==sents_label[i]: 
+			continue
+		else:
+			last_auth = sents_label[i]
+			cur_count = 0
+		cur_count+=1"""
 		text=input_sents[i].lower()
 
 		sents=sent_tokenizer.tokenize(text)
 		for j in range(len(sents)):
+				
 			tokens=word_tokenizer.tokenize(sents[j])
 			filt_toks=[]
 			filt_toks.append("[CLS]")

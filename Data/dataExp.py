@@ -259,8 +259,10 @@ class CorpusInterface:
         values = sort_tuple(values)
         return values
 
-    def get_data(self, n_authors: int = 50):
-        """ return the corpus's data that can be used by a model """
+    def get_data(self, n_authors: int = 50, keepPunct: bool = False):
+        """ return the corpus's data that can be used by a model 
+            , max_docs: int = 4, max_words: int = 500
+        """
         
         texts = []
         authors = []
@@ -268,10 +270,13 @@ class CorpusInterface:
         values = self.get_authors_by_text_size()
 
         for i in range(n_authors):
-            authors.append(values[i][0])
-            texts.append(self.authorToWorks[values[i][0]])
-
+            author = values[i][0]
+            for j in range(len(self.authorToWorks[author])):
+                text = self.authorToWorks[author][j][0]
+                texts.append(text)
+                authors.append(author)
         return texts, authors
+
     def lexical_diversity(self, authors):
         """
             This will measure the lexical diversity of a subset of the authors provided.
