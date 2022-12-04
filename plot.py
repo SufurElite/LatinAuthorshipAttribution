@@ -13,7 +13,7 @@ import os
 
 def author_text_length_plot(ci: CI, n_authors: int = 50, save_file: bool = False, extra_text: str = "all_data"):
     values = ci.get_authors_by_text_size()
-    plt.rcParams["figure.figsize"] = (20,10)
+    plt.rcParams["figure.figsize"] = (20,20)
     plt.title("Top " + str(n_authors) + " authors - " + extra_text)
     x = []
     
@@ -33,7 +33,7 @@ def author_text_length_plot(ci: CI, n_authors: int = 50, save_file: bool = False
 
 def author_work_count_plot(ci: CI, n_authors: int = 50, save_file: bool = False, extra_text: str = "all_data"):
     values = ci.get_authors_by_text_size(characterCount=False)
-    plt.rcParams["figure.figsize"] = (20,10)
+    plt.rcParams["figure.figsize"] = (20,20)
     plt.title("Top " + str(n_authors) + " authors - " + extra_text)
     x = []
 
@@ -53,7 +53,7 @@ def author_work_count_plot(ci: CI, n_authors: int = 50, save_file: bool = False,
 
 def author_lexical_diversity_plot(ci: CI, authors, save_file: bool = False, extra_text: str = "all_data"):
     values = ci.lexical_diversity(authors)
-    plt.rcParams["figure.figsize"] = (20,10)
+    plt.rcParams["figure.figsize"] = (20,20)
     plt.title("Top " + str(len(authors)) + " authors - " + extra_text)
     x = []
     for i in range(len(authors)):
