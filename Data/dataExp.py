@@ -16,7 +16,7 @@ ITALIAN_POETS_DIR = LATIN_BASE_DIR+"latin_text_poeti_ditalia/cltk_json/"
 LATIN_TESSERAE_DIR = LATIN_BASE_DIR+"lat_text_tesserae/texts/"
 
 class CorpusInterface:
-    def __init__(self, corpus_name="corpus.pickle", shouldTokenize:bool = True):
+    def __init__(self, corpus_name="corpus.pickle", shouldTokenize:bool = True, particular_data: list = ["tesserae", "italian_poets", "latin_library"]):
         self.OUR_CORPUS_LOC=os.getcwd()+"/Data/"+corpus_name
         # for the LatinBERT text encoding, tokenization will happen within the model
         self.shouldTokenize = shouldTokenize
@@ -24,7 +24,7 @@ class CorpusInterface:
         self.PrePro = PreProcessor()
         self.authorToWorks = {}
         self.authorToColours = {}
-        self.load_data()
+        self.load_data(particular_data)
         
         
         
@@ -175,10 +175,16 @@ class CorpusInterface:
                 author = data['author'].lower().replace(" ",'')
                 self.add_text(author, text)  
 
-    def load_new_data(self):
-        self.load_tesserae_corpus()
-        self.load_italian_poets()
-        self.load_latin_library()
+    def load_new_data(self, particular_data: list = ["tesserae", "italian_poets", "latin_library"]):
+        if "tesserae" in particular_data:
+            print("Loading Tesserae")
+            self.load_tesserae_corpus()
+        if "italian_poets" in particular_data:
+            print("Loading Italian Poets")
+            self.load_italian_poets()
+        if "latin_library" in particular_data:
+            print("Loading Latin Library")
+            self.load_latin_library()
         
     def save_corpus(self):
         with open(self.OUR_CORPUS_LOC, "wb") as f:
@@ -188,7 +194,7 @@ class CorpusInterface:
         with open(self.OUR_CORPUS_LOC, 'rb') as f:
             self.authorToWorks = pickle.load(f)
 
-    def load_data(self):
+    def load_data(self, particular_data: list = ["tesserae", "italian_poets", "latin_library"]):
         # first check if we have loaded the data using the fetch function
         if not os.path.exists(LATIN_BASE_DIR):
             print("Did not find the downloaded corpus. Did you run fetch.py? Now calling text_retrieval from fetch.py")
@@ -198,7 +204,7 @@ class CorpusInterface:
             print("Found the existing corpus")
             self.load_existing_corpus()
         else: 
-            self.load_new_data()
+            self.load_new_data(particular_data)
             # save new data
             self.save_corpus()
 
