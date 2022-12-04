@@ -3,7 +3,7 @@ from sklearn.feature_selection import SelectKBest, chi2
 import nltk
 from scipy.sparse import hstack, csr_matrix
 from sklearn.preprocessing import normalize
-from general.helpers import get_function_words, tokenize_nopunct, metric_scansion, dis_DVMA, dis_DVSA, dis_DVEX, \
+from .general.helpers import get_function_words, tokenize_nopunct, metric_scansion, dis_DVMA, dis_DVSA, dis_DVEX, \
     dis_DVL2
 
 
@@ -118,7 +118,7 @@ def featuresExtractor(doc_train, doc_test, cltk_train, cltk_test, y_tr, lang='la
     X_te = csr_matrix((len(doc_test), 0))
 
     fw = get_function_words(lang)
-
+    
     if function_words_freq:
         f = normalize(_function_words_freq(doc_train, fw))
         X_tr = hstack((X_tr, f))
