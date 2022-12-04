@@ -259,7 +259,7 @@ class CorpusInterface:
         values = sort_tuple(values)
         return values
 
-    def get_data(self, n_authors: int = 50, keepPunct: bool = False):
+    def get_data(self, n_authors: int = 50, keepPunct: bool = False, max_words: int = -1):
         """ return the corpus's data that can be used by a model 
             , max_docs: int = 4, max_words: int = 500
         """
@@ -273,6 +273,11 @@ class CorpusInterface:
             author = values[i][0]
             for j in range(len(self.authorToWorks[author])):
                 text = self.authorToWorks[author][j][0]
+                if max_words!=-1:
+                    text = text.split(" ")
+                    if len(text)>max_words:
+                        text = text[:200]
+                    text = " ".join(text)
                 texts.append(text)
                 authors.append(author)
         return texts, authors

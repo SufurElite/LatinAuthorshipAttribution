@@ -2,8 +2,13 @@
     A file to retrieve author specific data retrieval
 """
 
+# check if the directory exists yet
 import os
-os.environ["CLTK_DATA"] = os.getcwd()+"Data/texts/"
+if not os.path.exists(os.getcwd()+"/Data"):
+    os.mkdir(os.getcwd()+"/Data") 
+if not os.path.exists(os.getcwd()+"/Data/texts"):
+    os.mkdir(os.getcwd()+"/Data/texts") 
+os.environ["CLTK_DATA"] = os.getcwd()+"/Data/texts/"
 
 from cltk import NLP
 from cltk.data.fetch import FetchCorpus
