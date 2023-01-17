@@ -265,6 +265,13 @@ class CorpusInterface:
         values = sort_tuple(values)
         return values
 
+    def get_text_for_author(self, author):
+        text = []
+        assert(author in self.authorToWorks)
+        for txt in self.authorToWorks[author]:
+            text+=txt[0]
+        return " ".join(text)
+
     def get_data(self, n_authors: int = 50, keepPunct: bool = False, max_words: int = -1):
         """ return the corpus's data that can be used by a model 
             , max_docs: int = 4, max_words: int = 500
